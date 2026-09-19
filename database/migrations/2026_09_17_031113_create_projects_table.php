@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('title', 255);
             $table->mediumText('description');
             $table->string('category')->nullable();
-            $table->string('technology')->nullable();tes
+            $table->string('technology')->nullable();
             $table->timestamps();
         });
     }
