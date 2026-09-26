@@ -1,37 +1,54 @@
 @extends('layouts.app')
 
+@section('title', 'Tambah Projects - Kayfa Dyah Wulandari')
+
 @section('content')
-    <div class="jumbotron jumbotron-fluid">
-        <div class="container">
-            <h1>Tambah Projek Portofolio</h1>
+<div class="w-full max-w-2xl my-auto space-y-6">
+    <h1 class="text-4xl sm:text-5xl font-bold text-black">Tambah Projects</h1>
 
-            <form action="{{ route('projects.store') }}" method="POST">
-                @csrf
-                <div class="form-group mb-3">
-                    <label for="title">Title / Judul Projek</label>
-                    <input type="text" class="form-control" id="title" name="title" required>
-                </div>
+    <form action="{{ route('projects.store') }}" method="POST" class="space-y-5">
+        @csrf
 
-                <div class="form-group mb-3">
-                    <label for="description">Description / Deskripsi</label>
-                    <textarea class="form-control" id="description" rows="5" name="description" required></textarea>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-slate-700 text-sm font-bold mb-2">Kategori Projek</label>
-                    <input type="text" name="category" placeholder="Contoh: Web Application, Game Development"
-                        class="w-full p-2 border rounded-lg">
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-slate-700 text-sm font-bold mb-2">Teknologi/Tools</label>
-                    <input type="text" name="technology" placeholder="Contoh: Laravel, Java, Project Management"
-                        class="w-full p-2 border rounded-lg">
-                </div>
-
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <a href="{{ route('projects.index') }}" class="btn btn-secondary">Batal</a>
-            </form>
+        <div class="space-y-1">
+            <label for="title" class="block text-xl font-normal text-black">Nama proyek</label>
+            <input type="text" id="title" name="title" value="{{ old('title') }}" required
+                class="w-full p-3 border border-black rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-black">
+            @error('title')
+                <p class="text-red-600 text-xs font-medium pt-1">{{ $message }}</p>
+            @enderror
         </div>
-    </div>
+
+        <div class="space-y-1">
+            <label for="description" class="block text-xl font-normal text-black">Description</label>
+            <textarea id="description" name="description" rows="4" required
+                class="w-full p-3 border border-black rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-black">{{ old('description') }}</textarea>
+            @error('description')
+                <p class="text-red-600 text-xs font-medium pt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div class="space-y-1">
+            <label for="category" class="block text-xl font-normal text-black">Kategori Proyek</label>
+            <input type="text" id="category" name="category" value="{{ old('category') }}" placeholder="Contoh: Web Application, Game Development"
+                class="w-full p-3 border border-black rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-black">
+        </div>
+
+        <div class="space-y-1">
+            <label for="technology" class="block text-xl font-normal text-black">Tools</label>
+            <input type="text" id="technology" name="technology" value="{{ old('technology') }}" placeholder="Contoh: Laravel, Python, Java"
+                class="w-full p-3 border border-black rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-black">
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+            <button type="submit"
+                class="px-6 py-2 bg-[#040084] hover:bg-blue-900 text-white font-medium text-sm rounded-xl transition">
+                Submit
+            </button>
+            <a href="{{ route('projects.index') }}"
+                class="px-6 py-2 bg-[#040084] hover:bg-blue-900 text-white font-medium text-sm rounded-xl transition no-underline">
+                Batal
+            </a>
+        </div>
+    </form>
+</div>
 @endsection
