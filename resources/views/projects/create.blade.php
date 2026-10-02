@@ -39,6 +39,14 @@
                 class="w-full p-3 border border-black rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-black">
         </div>
 
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select id =" status " name =" status " >
+                <option value ="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                <option value ="published" {{ old('status') == 'published' ? 'selected' : '' }}>Published</option>
+            </select>
+        </div>
+
         <div class="flex justify-end gap-3 pt-4">
             <button type="submit"
                 class="px-6 py-2 bg-[#040084] hover:bg-blue-900 text-white font-medium text-sm rounded-xl transition">

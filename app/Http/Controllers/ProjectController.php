@@ -3,13 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\project;
+use App\Models\Project;
 
 class ProjectController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $projects = project::all();
+        $query = Project::query();
+
+        if ($request->filled('search')) {
+            $query->search($request->search); 
+        }
+        $projects = $query->latest()->get();
         return view('projects.index', compact('projects'));
     }
 
@@ -25,25 +30,26 @@ class ProjectController extends Controller
             'description' => 'required|string|min:10',
             'category' => 'nullable|string',
             'technology' => 'nullable|string',
+            'status' => 'nullable|string',
         ], [
             'title.min' => 'Title harus memiliki minimal 5 karakter.',
             'description.min' => 'Description harus memiliki minimal 10 karakter.',
         ]);
 
-        project::create($validated);
+        Project::create($validated);
 
         return redirect()->route('projects.index')->with('success', 'Proyek berhasil ditambahkan!');
     }
 
     public function show(string $id)
     {
-        $project = project::findOrFail($id);
+        $project = Project::findOrFail($id);
         return view('projects.show', compact('project'));
     }
 
     public function edit(string $id)
     {
-        $project = project::findOrFail($id);
+        $project = Project::findOrFail($id);
         return view('projects.edit', compact('project'));
     }
 
@@ -59,7 +65,7 @@ class ProjectController extends Controller
             'description.min' => 'Description harus memiliki minimal 10 karakter.',
         ]);
 
-        $project = project::findOrFail($id);
+        $project = Project::findOrFail($id);
         $project->update($validated);
 
         return redirect()->route('projects.index')->with('success', 'Proyek berhasil diperbarui!');
@@ -67,9 +73,33 @@ class ProjectController extends Controller
 
     public function destroy(string $id)
     {
-        $project = project::findOrFail($id);
+        $project = Project::findOrFail($id);
         $project->delete();
 
-        return redirect()->route('projects.index')->with('success', 'Proyek berhasil dihapus!');
+        return redirect()->route('projects.index')->with('success', 'Proyek berhasil dihapus! (soft delete)!');
+    }
+
+    public function trash()
+    {
+        $trashedProjects = Project::onlyTrashed()->get();
+        return view('projects.trash', compact('trashedProjects'));
+    }
+
+    // Mengembalikan data terhapus (Restore)
+    public function restore(string $id)
+    {
+        $project = Project::withTrashed()->findOrFail($id);
+        $project->restore();
+
+        return redirect()->route('projects.trash')->with('success', 'Proyek berhasil dipulihkan!');
+    }
+
+    // Hapus Permanen
+    public function forceDelete(string $id)
+    {
+        $project = Project::withTrashed()->findOrFail($id);
+        $project->forceDelete();
+
+        return redirect()->route('projects.trash')->with('success', 'Proyek berhasil dihapus permanen!');
     }
 }
