@@ -9,12 +9,18 @@ class ProjectController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Project::query();
+        // 1. Ambil input search dan per_page dari request (default 10)
+        $search = $request->input('search');
+        $perPage = $request->input('per_page', 10);
 
-        if ($request->filled('search')) {
-            $query->search($request->search); 
-        }
-        $projects = $query->latest()->get();
+        // 2. Query data dengan pencarian dan pagination
+        $projects = Project::when($search, function ($query, $search) {
+                return $query->where('title', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate($perPage)
+            ->appends($request->all()); // Untuk menjaga parameter URL saat berpindah halaman
+
         return view('projects.index', compact('projects'));
     }
 
