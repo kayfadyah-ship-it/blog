@@ -18,6 +18,26 @@
             <a href="{{ route('projects.index') }}" class="{{ request()->routeIs('projects*') ? 'text-[#040084] font-medium' : 'text-black hover:text-[#040084]' }} transition">
                 Projects
             </a>
+            @auth
+                <div class="flex items-center space-x-4 pl-4 border-l border-gray-300">
+                    <!-- Menampilkan Nama User yang Login -->
+                    <span class="text-[#040084] font-semibold">
+                        {{ Auth::user()->name }}
+                    </span>
+
+                    <!-- Form Logout -->
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="text-red-600 hover:text-red-800 font-medium transition cursor-pointer">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            @else
+                <a href="{{ route('login') }}" class="text-black hover:text-[#040084] font-medium transition">
+                    Login
+                </a>
+            @endauth
         </nav>
     </div>
 </header>

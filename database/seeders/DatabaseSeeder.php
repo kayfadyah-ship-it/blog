@@ -18,10 +18,22 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::firstOrCreate([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        //akun admin
+        User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+            'name' => 'Admin User',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+        ]);
+
+        //akun user biasa
+        User::firstOrCreate(
+            ['email' => 'user@example.com'],
+            [
+            'name' => 'User Biasa',
             'password' => Hash::make('12345'),
+            'role' => 'user',
         ]);
 
         $this->call([
