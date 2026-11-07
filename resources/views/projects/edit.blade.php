@@ -1,54 +1,43 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Projects - Kayfa Dyah Wulandari')
+@section('title', 'Edit Skill - Kayfa Dyah Wulandari')
 
 @section('content')
 <div class="w-full max-w-2xl my-auto space-y-6">
-    <h1 class="text-4xl sm:text-5xl font-bold text-black">Edit Projects</h1>
+    <h1 class="text-4xl sm:text-5xl font-bold text-black">Edit Skill</h1>
 
-    <form action="{{ route('projects.update', $project->id) }}" method="POST" class="space-y-5">
+    <form action="{{ route('post.skills.update', $skill->id) }}" method="POST" class="space-y-5">
         @csrf
         @method('PUT')
 
         <div class="space-y-1">
-            <label for="title" class="block text-xl font-normal text-black">Nama proyek</label>
-            <input type="text" id="title" name="title" value="{{ $project->title }}" required
+            <label for="name" class="block text-xl font-normal text-black">Nama Skill</label>
+            <input type="text" id="name" name="name" value="{{ old('name', $skill->name) }}" required
                 class="w-full p-3 border border-black rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-black">
+            @error('name')
+                <p class="text-red-600 text-xs font-medium pt-1">{{ $message }}</p>
+            @enderror
         </div>
 
-        <div class="space-y-1">
-            <label for="description" class="block text-xl font-normal text-black">Description</label>
-            <textarea id="description" name="description" rows="4" required
-                class="w-full p-3 border border-black rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-black">{{ $project->description }}</textarea>
-        </div>
-
-        <div class="space-y-1">
-            <label for="category" class="block text-xl font-normal text-black">Kategori Proyek</label>
-            <input type="text" id="category" name="category" value="{{ $project->category }}"
-                class="w-full p-3 border border-black rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-black">
-        </div>
-
-        <div class="space-y-1">
-            <label for="technology" class="block text-xl font-normal text-black">Tools</label>
-            <input type="text" id="technology" name="technology" value="{{ $project->technology }}"
-                class="w-full p-3 border border-black rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-black">
-        </div>
-
-        <div class="form-group">
-            <label for="status">Status</label>
-            <select id =" status " name =" status " >
-                <option value ="draft" {{ $project->status == 'draft' ? 'selected' : '' }}>Draft</option>
-                <option value ="published" {{ $project->status == 'published' ? 'selected' : '' }}>Published</option>
-            </select>
-        </div>
+        {{-- Input Persentase jika tabel skills memiliki kolom percentage --}}
+        @if(isset($skill->percentage))
+            <div class="space-y-1">
+                <label for="percentage" class="block text-xl font-normal text-black">Persentase (%)</label>
+                <input type="number" id="percentage" name="percentage" value="{{ old('percentage', $skill->percentage) }}" min="1" max="100"
+                    class="w-full p-3 border border-black rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-black">
+                @error('percentage')
+                    <p class="text-red-600 text-xs font-medium pt-1">{{ $message }}</p>
+                @enderror
+            </div>
+        @endif
 
         <div class="flex justify-end gap-3 pt-4">
             <button type="submit"
                 class="px-6 py-2 bg-[#040084] hover:bg-blue-900 text-white font-medium text-sm rounded-xl transition">
-                Submit
+                Simpan Perubahan
             </button>
-            <a href="{{ route('projects.index') }}"
-                class="px-6 py-2 bg-[#040084] hover:bg-blue-900 text-white font-medium text-sm rounded-xl transition no-underline">
+            <a href="{{ route('post.skills.index') }}"
+                class="px-6 py-2 bg-slate-200 hover:bg-slate-300 text-black font-medium text-sm rounded-xl transition no-underline">
                 Batal
             </a>
         </div>

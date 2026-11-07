@@ -20,7 +20,7 @@
             <p class="text-slate-600 text-sm mt-1">Daftar proyek yang dihapus sementara (Soft Delete).</p>
         </div>
 
-        <a href="{{ route('projects.index') }}"
+        <a href="{{ route('post.projects.index') }}"
             class="px-6 py-2 bg-[#040084] hover:bg-blue-900 text-white font-medium text-sm rounded-xl transition">
             Kembali ke Projects
         </a>
@@ -57,7 +57,7 @@
 
                     <div class="flex items-center gap-2">
                         {{-- Tombol Restore --}}
-                        <form action="{{ route('projects.restore', $project->id) }}" method="POST">
+                        <form action="{{ route('post.projects.restore', $project->id) }}" method="POST">
                             @csrf
                             <button type="submit"
                                 class="px-4 py-1.5 bg-emerald-800 hover:bg-emerald-700 text-white font-medium text-xs rounded-lg transition shadow">
@@ -66,7 +66,7 @@
                         </form>
 
                         {{-- Tombol Permanent Delete --}}
-                        <form action="{{ route('projects.force-delete', $project->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus proyek ini secara permanen?')">
+                        <form action="{{ route('post.projects.force-delete', $project->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus proyek ini secara permanen?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit"

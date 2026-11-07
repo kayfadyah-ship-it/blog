@@ -17,7 +17,20 @@ class Project extends Model
         'category',
         'technology',
         'status',
+        'thumbnail',
     ];
+
+    // Relasi ke Category
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    // Relasi ke ProjectImage (Gallery)
+    public function images()
+    {
+        return $this->hasMany(ProjectImage::class)->orderBy('sort_order');
+    }
 
     public function scopeSearch(Builder $query, string $keyword): Builder
     {

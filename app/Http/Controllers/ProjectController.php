@@ -4,43 +4,58 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Models\Category;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Ambil input search dan per_page dari request (default 10)
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10);
 
-        // 2. Query data dengan pencarian dan pagination
-        $projects = Project::when($search, function ($query, $search) {
-                return $query->where('title', 'like', "%{$search}%");
+        $query = Project::query();
+
+        if (!auth()->check() || (!auth()->user()->is_admin && auth()->user()->role !== 'admin')) {
+            $query->where('status', 'published');
+        }
+
+        $projects = $query->when($search, function ($q, $search) {
+                return $q->where('title', 'like', "%{$search}%");
             })
             ->latest()
             ->paginate($perPage)
-            ->appends($request->all()); // Untuk menjaga parameter URL saat berpindah halaman
+            ->appends($request->all());
 
         return view('projects.index', compact('projects'));
     }
 
     public function create()
     {
-        return view('projects.create');
+        // Ambil data kategori untuk pilihan dropdown di form tambah
+        $categories = Category::all();
+        return view('projects.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|min:5|max:255',
+            'title'       => 'required|string|min:5|max:255',
             'description' => 'required|string|min:10',
-            'category' => 'nullable|string',
-            'technology' => 'nullable|string',
-            'status' => 'nullable|string',
+            'category'    => 'nullable|string',
+            'technology'  => 'nullable|string',
+            'status'      => 'nullable|string',
+            'thumbnail'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
-            'title.min' => 'Title harus memiliki minimal 5 karakter.',
+            'title.min'       => 'Title harus memiliki minimal 5 karakter.',
             'description.min' => 'Description harus memiliki minimal 10 karakter.',
+            'thumbnail.image' => 'Berkas harus berupa gambar (jpg, jpeg, png, webp).',
+            'thumbnail.max'   => 'Ukuran file thumbnail tidak boleh lebih dari 2MB.',
         ]);
+
+        if ($request->hasFile('thumbnail')) {
+            $validated['thumbnail'] = $request->file('thumbnail')->store('projects/thumbnails', 'public');
+        }
 
         Project::create($validated);
 
@@ -49,32 +64,45 @@ class ProjectController extends Controller
 
     public function show(string $id)
     {
-        $project = Project::findOrFail($id);
+        $project = Project::with('images')->findOrFail($id);
         return view('projects.show', compact('project'));
     }
 
     public function edit(string $id)
     {
         $project = Project::findOrFail($id);
-        return view('projects.edit', compact('project'));
+        $categories = Category::all();
+        return view('projects.edit', compact('project', 'categories'));
     }
 
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
-            'title' => 'required|string|min:5|max:255',
+            'title'       => 'required|string|min:5|max:255',
             'description' => 'required|string|min:10',
-            'category' => 'nullable|string',
-            'technology' => 'nullable|string',
+            'category'    => 'nullable|string',
+            'technology'  => 'nullable|string',
+            'status'      => 'nullable|string',
+            'thumbnail'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
-            'title.min' => 'Title harus memiliki minimal 5 karakter.',
+            'title.min'       => 'Title harus memiliki minimal 5 karakter.',
             'description.min' => 'Description harus memiliki minimal 10 karakter.',
+            'thumbnail.image' => 'Berkas harus berupa gambar (jpg, jpeg, png, webp).',
+            'thumbnail.max'   => 'Ukuran file thumbnail tidak boleh lebih dari 2MB.',
         ]);
 
         $project = Project::findOrFail($id);
+
+        if ($request->hasFile('thumbnail')) {
+            if ($project->thumbnail) {
+                Storage::disk('public')->delete($project->thumbnail);
+            }
+            $validated['thumbnail'] = $request->file('thumbnail')->store('projects/thumbnails', 'public');
+        }
+        
         $project->update($validated);
 
-        return redirect()->route('projects.index')->with('success', 'Proyek berhasil diperbarui!');
+        return redirect()->route('post.projects.index')->with('success', 'Proyek berhasil diperbarui!');
     }
 
     public function destroy(string $id)
@@ -82,7 +110,7 @@ class ProjectController extends Controller
         $project = Project::findOrFail($id);
         $project->delete();
 
-        return redirect()->route('projects.index')->with('success', 'Proyek berhasil dihapus! (soft delete)!');
+        return redirect()->route('post.projects.index')->with('success', 'Proyek berhasil dihapus! (soft delete)');
     }
 
     public function trash()
@@ -91,7 +119,6 @@ class ProjectController extends Controller
         return view('projects.trash', compact('trashedProjects'));
     }
 
-    // Mengembalikan data terhapus (Restore)
     public function restore(string $id)
     {
         $project = Project::withTrashed()->findOrFail($id);
@@ -100,10 +127,20 @@ class ProjectController extends Controller
         return redirect()->route('projects.trash')->with('success', 'Proyek berhasil dipulihkan!');
     }
 
-    // Hapus Permanen
     public function forceDelete(string $id)
     {
         $project = Project::withTrashed()->findOrFail($id);
+
+        if ($project->thumbnail) {
+            Storage::disk('public')->delete($project->thumbnail);
+        }
+
+        if ($project->images) {
+            foreach ($project->images as $img) {
+                Storage::disk('public')->delete($img->image);
+            }
+        }
+
         $project->forceDelete();
 
         return redirect()->route('projects.trash')->with('success', 'Proyek berhasil dihapus permanen!');
