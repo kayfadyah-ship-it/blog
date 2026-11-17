@@ -27,7 +27,7 @@
             @enderror
         </div>
 
-        {{-- Mengubah Input Kategori Menjadi Dropdown Select --}}
+        {{-- Dropdown Kategori --}}
         <div class="space-y-1">
             <label for="category" class="block text-xl font-normal text-black">Kategori Proyek</label>
             <select id="category" name="category" required class="w-full p-3 border border-black rounded-xl text-sm bg-white focus:outline-none focus:ring-1 focus:ring-black">
@@ -40,10 +40,32 @@
             </select>
         </div>
 
+        {{-- Checkbox Technologies (Many-to-Many) --}}
+        <div class="space-y-2">
+            <label class="block text-xl font-normal text-black">Tools / Teknologi</label>
+            <div class="flex flex-wrap gap-3 p-3 border border-black rounded-xl bg-white">
+                @foreach($technologies as $tech)
+                    <label class="inline-flex items-center gap-2 text-sm text-black cursor-pointer">
+                        <input type="checkbox" name="technologies[]" value="{{ $tech->id }}"
+                            {{ in_array($tech->id, old('technologies', [])) ? 'checked' : '' }}
+                            class="rounded border-slate-400 text-[#040084] focus:ring-[#040084]">
+                        <span>{{ $tech->name }}</span>
+                    </label>
+                @endforeach
+            </div>
+            @error('technologies')
+                <p class="text-red-600 text-xs font-medium pt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- Input Tanggal Proyek (project_date) --}}
         <div class="space-y-1">
-            <label for="technology" class="block text-xl font-normal text-black">Tools</label>
-            <input type="text" id="technology" name="technology" value="{{ old('technology') }}" placeholder="Contoh: Laravel, Python, Java"
-                class="w-full p-3 border border-black rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-black">
+            <label for="project_date" class="block text-xl font-normal text-black">Tanggal Proyek</label>
+            <input type="date" id="project_date" name="project_date" value="{{ old('project_date') }}"
+                class="w-full p-3 border border-black rounded-xl text-sm bg-white focus:outline-none focus:ring-1 focus:ring-black">
+            @error('project_date')
+                <p class="text-red-600 text-xs font-medium pt-1">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="space-y-1">

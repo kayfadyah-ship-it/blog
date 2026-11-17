@@ -13,11 +13,17 @@ class Project extends Model
 
     protected $fillable = [
         'title',
+        'slug',
+        'short_description',
         'description',
         'category',
         'technology',
         'status',
         'thumbnail',
+        'project_date',
+        'is_featured',
+        'project_url',
+        'repository_url'
     ];
 
     // Relasi ke Category
@@ -42,4 +48,9 @@ class Project extends Model
     {
         return $query->where('status', 'published');
     }
+
+    public function technologies()
+    {
+    return $this->belongsToMany(Technology::class);
+    }   
 }
